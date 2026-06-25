@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOID•NET | SAMP ASSAULT v4.2</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap');
+        
+        :root {
+            --primary: #00ff41;
+            --danger: #ff0033;
+            --bg: #0a0a0a;
+            --panel: #111111;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(180deg, #0a0a0a, #1a0000);
+            color: var(--primary);
+            font-family: 'VT323', monospace;
+            overflow: hidden;
+            height: 100vh;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(0, 255, 65, 0.05) 0%, transparent 50%);
+        }
+        
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(transparent, rgba(0, 255, 65, 0.03), transparent);
+            background-size: 100% 200%;
+            animation: scan 8s linear infinite;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        @keyframes scan {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 -200%; }
+        }
+        
+        header {
+            background: rgba(10, 10, 10, 0.95);
+            border-bottom: 2px solid var(--primary);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+        }
+        
+        .logo {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 24px;
+            text-shadow: 0 0 10px var(--primary);
+            letter-spacing: 4px;
+        }
+        
+        .status {
+            display: flex;
+            gap: 20px;
+            font-size: 18px;
+        }
+        
+        .dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #00ff41;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .container {
+            display: flex;
+            height: calc(100vh - 70px);
+        }
+        
+        .sidebar {
+            width: 280px;
+            background: rgba(17, 17, 17, 0.95);
+            border-right: 2px solid var(--primary);
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .main {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--primary);
+            padding: 15px;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+        }
+        
+        .title {
+            font-size: 22px;
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 0 0 10px var(--primary);
+        }
+        
+        input, select, button {
+            background: #000;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 10px;
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        button {
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+        
+        button:hover {
+            background: var(--primary);
+            color: black;
+            box-shadow: 0 0 20px var(--primary);
+        }
+        
+        .attack-btn {
+            background: #ff0033;
+            font-size: 24px;
+            padding: 15px;
+            border: 2px solid #ff3366;
+        }
+        
+        .attack-btn:hover {
+            background: #ff3366;
+            box-shadow: 0 0 30px #ff0033;
+        }
+        
+        .terminal {
+            background: #000;
+            border: 1px solid #00ff41;
+            height: 320px;
+            padding: 15px;
+            overflow-y: auto;
+            font-size: 16px;
+            line-height: 1.4;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+        }
+        
+        .log {
+            color: #00ff41;
+            margin-bottom: 4px;
+        }
+        
+        .log.error { color: #ff3366; }
+        .log.success { color: #00ff88; }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            border: 1px solid var(--primary);
+            padding: 12px;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            text-shadow: 0 0 10px currentColor;
+        }
+        
+        .progress-container {
+            margin: 15px 0;
+        }
+        
+        .progress-bar {
+            height: 18px;
+            background: #111;
+            border: 1px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff41, #00cc33);
+            width: 0%;
+            transition: width 0.3s;
+            box-shadow: 0 0 15px var(--primary);
+        }
+        
+        .bots {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .bot {
+            background: #001a00;
+            border: 1px solid #00ff41;
+            padding: 4px 10px;
+            font-size: 14px;
+            animation: botpulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        
+        @keyframes botpulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .target-info {
+            font-size: 20px;
+            text-align: center;
+            padding: 10px;
+            background: #220000;
+            border: 1px dashed #ff3366;
+        }
+    </style>
+</head>
+<body>
+    <div class="scanline"></div>
+    
+    <header>
+        <div class="logo">VOID<span style="color:#ff0033;">NET</span></div>
+        <div class="status">
+            <span>CONNECTION: <span class="dot"></span> SECURE</span>
+            <span>BOTS: <span id="bot-count">1427</span></span>
+            <span>STATUS: <span id="global-status" style="color:#00ff88;">ARMED</span></span>
+        </div>
+    </header>
+    
+    <div class="container">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="panel">
+                <h2 class="title">TARGET ACQUISITION</h2>
+                <input type="text" id="target-ip" value="45.79.XXX.XXX:7777" placeholder="IP:PORT">
+                <input type="text" id="target-name" value="MyServerRoleplay" placeholder="Server Name">
+                
+                <label>ATTACK VECTOR:</label>
+                <select id="attack-type">
+                    <option value="udp">UDP FLOOD (SAMP)</option>
+                    <option value="syn">SYN FLOOD</option>
+                    <option value="amp">DNS/NTP AMPLIFICATION</option>
+                    <option value="http">LAYER 7 (HTTP-GET)</option>
+                    <option value="samp">SAMP PACKET SPAM</option>
+                </select>
+                
+                <label>INTENSITY:</label>
+                <select id="intensity">
+                    <option value="low">LOW (STEALTH)</option>
+                    <option value="medium" selected>MEDIUM (BALANCED)</option>
+                    <option value="high">HIGH (DESTRUCTIVE)</option>
+                    <option value="extreme">EXTREME (NUCLEAR)</option>
+                </select>
+                
+                <button onclick="startAttack()" class="attack-btn" id="attack-button">LAUNCH ASSAULT</button>
+                <button onclick="stopAttack()" style="background:#333; border-color:#666;">ABORT MISSION</button>
+            </div>
+            
+            <div class="panel" style="margin-top:20px;">
+                <h3>CONNECTED ZOMBIES</h3>
+                <div class="bots" id="bot-list">
+                    <!-- JS populated -->
+                </div>
+            </div>
+            
+            <div class="panel" style="margin-top:20px;">
+                <h3>TOOLS</h3>
+                <button onclick="fakeTool('spoof')">SPOOF IP RANGE</button>
+                <button onclick="fakeTool('proxy')">PROXY CHAIN (TOR)</button>
+                <button onclick="fakeTool('exploit')">SAMP EXPLOIT PACK</button>
+                <button onclick="fakeTool('bypass')">ANTI-DDoS BYPASS</button>
+            </div>
+        </div>
+        
+        <!-- MAIN CONTENT -->
+        <div class="main">
+            <!-- TARGET STATUS -->
+            <div class="panel">
+                <div class="target-info">
+                    <strong>TARGET:</strong> <span id="current-target">45.79.XXX.XXX:7777</span> — 
+                    <span id="server-name">MyServerRoleplay</span>
+                </div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div>Packets Sent</div>
+                        <div class="stat-value" id="packets">0</div>
+                        <small style="color:#ffaa00;">/sec</small>
+                    </div>
+                    <div class="stat-item">
+                        <div>Bandwidth</div>
+                        <div class="stat-value" id="bandwidth">0</div>
+                        <small>MB/s</small>
+                    </div>
+                    <div class="stat-item">
+                        <div>Response Time</div>
+                        <div class="stat-value" id="latency">∞</div>
+                        <small>ms</small>
+                    </div>
+                    <div class="stat-item">
+                        <div>Server Load</div>
+                        <div class="stat-value" id="load">0%</div>
+                    </div>
+                </div>
+                
+                <div class="progress-container">
+                    <div style="display:flex;justify-content:space-between;font-size:18px;">
+                        <span>SERVER STABILITY</span>
+                        <span id="stability-text">100%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress" id="stability-bar" style="width:100%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- LIVE TERMINAL -->
+            <div class="panel" style="flex:1;display:flex;flex-direction:column;">
+                <h2 class="title">ATTACK CONSOLE</h2>
+                <div class="terminal" id="terminal">
+                    <div class="log">[VOID•NET] Connected to C2 Server • 1427 zombies online</div>
+                    <div class="log">[INFO] SAMP protocol detected on port 7777</div>
+                </div>
+            </div>
+            
+            <!-- VISUAL FEEDBACK -->
+            <div class="panel">
+                <div style="text-align:center; font-size:18px; margin-bottom:10px;">ATTACK VISUALIZER</div>
+                <div style="height:180px; background:#000; position:relative; border:1px solid #00ff41; overflow:hidden;" id="visualizer">
+                    <!-- Canvas for particles will be added via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let isAttacking = false;
+        let interval = null;
+        let packetsSent = 0;
+        let logs = [];
+        
+        const terminal = document.getElementById('terminal');
+        
+        function addLog(text, type = 'log') {
+            const entry = document.createElement('div');
+            entry.className = `log ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
+            terminal.appendChild(entry);
+            terminal.scrollTop = terminal.scrollHeight;
+            
+            if (terminal.children.length > 30) {
+                terminal.removeChild(terminal.children[0]);
+            }
+        }
+        
+        function updateStats() {
+            if (!isAttacking) return;
+            
+            packetsSent += Math.floor(Math.random() * 45000) + 12000;
+            document.getElementById('packets').textContent = packetsSent.toLocaleString();
+            
+            const bandwidth = (Math.random() * 85 + 45).toFixed(1);
+            document.getElementById('bandwidth').textContent = bandwidth;
+            
+            const latency = Math.floor(Math.random() * 80) + 120;
+            document.getElementById('latency').textContent = latency;
+            
+            const load = Math.min(98, Math.floor(Math.random() * 35) + 65);
+            document.getElementById('load').textContent = load + '%';
+            
+            // Stability drop
+            const stability = Math.max(12, 100 - Math.floor(packetsSent / 80000));
+            document.getElementById('stability-bar').style.width = stability + '%';
+            document.getElementById('stability-text').textContent = stability + '%';
+            document.getElementById('stability-text').style.color = stability < 40 ? '#ff3366' : '#00ff88';
+        }
+        
+        function startAttack() {
+            if (isAttacking) return;
+            
+            const target = document.getElementById('target-ip').value;
+            const name = document.getElementById('target-name').value;
+            
+            document.getElementById('current-target').textContent = target;
+            document.getElementById('server-name').textContent = name;
+            
+            isAttacking = true;
+            packetsSent = 0;
+            
+            document.getElementById('attack-button').style.background = '#00ff41';
+            document.getElementById('attack-button').style.color = '#000';
+            document.getElementById('attack-button').textContent = 'ASSAULT IN PROGRESS...';
+            
+            addLog(`LAUNCHING ${document.getElementById('attack-type').value.toUpperCase()} ATTACK ON ${target}`, 'success');
+            addLog('Spoofing source IPs across 47 countries...', 'log');
+            addLog('Establishing 1427 bot connections...', 'success');
+            
+            // Fake logs
+            setTimeout(() => addLog('SAMP server responded with lag spike (240ms)'), 800);
+            setTimeout(() => addLog('UDP packets flooding port 7777...'), 1500);
+            setTimeout(() => addLog('Server CPU usage: 87% • Memory: 94%', 'error'), 2800);
+            setTimeout(() => addLog('Players disconnecting... (124/250)', 'error'), 4200);
+            
+            interval = setInterval(() => {
+                updateStats();
+                
+                if (Math.random() > 0.85) {
+                    const messages = [
+                        'Packet storm intensified',
+                        'Server tick rate dropped to 12Hz',
+                        'Firewall bypassed via SAMP exploit',
+                        'Player ID 452 kicked (timeout)',
+                        'Amplification factor: 68x'
+                    ];
+                    addLog(messages[Math.floor(Math.random() * messages.length)]);
+                }
+            }, 280);
+            
+            // Start visualizer
+            startVisualizer();
+        }
+        
+        function stopAttack() {
+            if (!isAttacking) return;
+            
+            clearInterval(interval);
+            isAttacking = false;
+            
+            document.getElementById('attack-button').style.background = '#ff0033';
+            document.getElementById('attack-button').style.color = 'white';
+            document.getElementById('attack-button').textContent = 'LAUNCH ASSAULT';
+            
+            addLog('=== ATTACK ABORTED ===', 'error');
+            addLog('Cleaning traces...');
+            
+            setTimeout(() => {
+                addLog('Session terminated. All bots disconnected.', 'success');
+            }, 1200);
+        }
+        
+        function fakeTool(tool) {
+            const messages = {
+                spoof: 'IP range spoofed: 12.4k addresses randomized',
+                proxy: 'Tor + Residential proxy chain activated',
+                exploit: 'SAMP 0.3.7 R2 vulnerability injected',
+                bypass: 'Cloudflare/OVH protection neutralized'
+            };
+            
+            addLog(messages[tool] || 'Tool executed successfully', 'success');
+        }
+        
+        // Visualizer with canvas particles
+        let canvas, ctx;
+        
+        function startVisualizer() {
+            const container = document.getElementById('visualizer');
+            if (canvas) return;
+            
+            canvas = document.createElement('canvas');
+            canvas.width = container.offsetWidth;
+            canvas.height = 180;
+            ctx = canvas.getContext('2d');
+            container.appendChild(canvas);
+            
+            let particles = [];
+            
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 4 + 1;
+                    this.speed = Math.random() * 3 + 1;
+                    this.color = Math.random() > 0.5 ? '#00ff41' : '#ff3366';
+                }
+                
+                update() {
+                    this.y += this.speed;
+                    if (this.y > canvas.height) this.y = 0;
+                }
+                
+                draw() {
+                    ctx.fillStyle = this.color;
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = this.color;
+                    ctx.fillRect(this.x, this.y, this.size, this.size * 6);
+                }
+            }
+            
+            for (let i = 0; i < 120; i++) {
+                particles.push(new Particle());
+            }
+            
+            function animate() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                }
+                
+                if (isAttacking) {
+                    requestAnimationFrame(animate);
+                } else {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+            
+            animate();
+        }
+        
+        // Initialize bots
+        function initBots() {
+            const botList = document.getElementById('bot-list');
+            const countries = ['RU', 'BR', 'ID', 'US', 'DE', 'IN', 'VN', 'TR'];
+            
+            for (let i = 0; i < 18; i++) {
+                const bot = document.createElement('div');
+                bot.className = 'bot';
+                bot.textContent = `${countries[Math.floor(Math.random()*countries.length)]}-${Math.floor(Math.random()*999)}`;
+                botList.appendChild(bot);
+            }
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && document.getElementById('target-ip') === document.activeElement) {
+                startAttack();
+            }
+        });
+        
+        // Init
+        window.onload = () => {
+            initBots();
+            addLog('VOID•NET C2 Server initialized. Ready for deployment.');
+            addLog('Target: GTA SAMP Server — Ready to crash.', 'success');
+            
+            // Random bot count fluctuation
+            setInterval(() => {
+                if (!isAttacking) {
+                    const count = Math.floor(Math.random() * 80) + 1380;
+                    document.getElementById('bot-count').textContent = count;
+                }
+            }, 4500);
+        };
+    </script>
+</body>
+</html>
